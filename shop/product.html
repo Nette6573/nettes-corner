@@ -41,6 +41,26 @@ border-radius:12px;
 background:white;
 }
 
+.thumbs{
+display:flex;
+gap:10px;
+margin-top:15px;
+flex-wrap:wrap;
+}
+
+.thumb{
+width:70px;
+height:70px;
+object-fit:cover;
+cursor:pointer;
+border:2px solid transparent;
+border-radius:8px;
+}
+
+.thumb:hover{
+border-color:var(--plum);
+}
+
 .title{
 font-size:2rem;
 margin-bottom:15px;
@@ -202,7 +222,17 @@ document.getElementById('productContainer').innerHTML=`
 <div class="product-layout">
 
 <div class="gallery">
-<img src="${product.image}" alt="${product.title}">
+
+<img
+    id="mainImage"
+    src="${product.image}"
+    alt="${product.title}"
+>
+
+<div id="imageThumbs"
+     class="thumbs">
+</div>
+
 </div>
 
 <div>
@@ -216,9 +246,7 @@ ${product.description ? product.description : "Faith-inspired product from Nette
 </p>
 
 <div id="productOptions">
-
-    ${optionsHtml}
-
+${optionsHtml}
 </div>
 
 <div class="selector">
@@ -233,7 +261,44 @@ Add To Cart
 </div>
 
 </div>
+
 `;
+
+/* Build thumbnail gallery */
+
+setTimeout(() => {
+
+```
+const thumbs =
+    document.getElementById('imageThumbs');
+
+if(!thumbs || !product.images) return;
+
+thumbs.innerHTML = '';
+
+product.images.forEach(img => {
+
+    const thumb =
+        document.createElement('img');
+
+    thumb.src = img.src;
+
+    thumb.className = 'thumb';
+
+    thumb.onclick = () => {
+
+        document
+            .getElementById('mainImage')
+            .src = img.src;
+
+    };
+
+    thumbs.appendChild(thumb);
+
+});
+```
+
+}, 100);
 
 loadRelated(productId);
 

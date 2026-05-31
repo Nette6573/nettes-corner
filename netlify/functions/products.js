@@ -16,6 +16,7 @@ exports.handler = async () => {
       title: product.title,
       description: product.description,
       image: product.images?.[0]?.src || "",
+      images: product.images || [],
       visible: product.visible,
       price:
         (product.variants?.find(v => v.is_enabled)?.price ||
