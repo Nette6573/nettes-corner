@@ -18,9 +18,11 @@ exports.handler = async () => {
       image: product.images?.[0]?.src || "",
       visible: product.visible,
       price:
-        product.variants?.find(v => v.is_enabled)?.price / 100 ||
-        product.variants?.[0]?.price / 100 ||
-        0
+        (product.variants?.find(v => v.is_enabled)?.price ||
+          product.variants?.[0]?.price ||
+          0) / 100,
+      options: product.options,
+      variants: product.variants,
     }));
 
     return {
