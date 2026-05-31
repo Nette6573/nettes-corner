@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nette's Corner Shop</title>
+
+```
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #faf7f2;
+        color: #333;
+    }
+
+    .hero {
+        background: white;
+        padding: 60px 20px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .hero h1 {
+        color: #1F3A5F;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .hero p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .products-container {
+        max-width: 1400px;
+        margin: auto;
+        padding: 50px 20px;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,.08);
+        transition: transform .3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-6px);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+    }
+
+    .product-content {
+        padding: 20px;
+    }
+
+    .product-title {
+        color: #1F3A5F;
+        font-size: 1rem;
+        line-height: 1.4;
+        min-height: 75px;
+        margin-bottom: 15px;
+    }
+
+    .product-price {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #C9A45C;
+        margin-bottom: 15px;
+    }
+
+    .view-btn {
+        display: inline-block;
+        background: #1F3A5F;
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        transition: .3s;
+    }
+
+    .view-btn:hover {
+        background: #2b4d78;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 80px;
+        color: #666;
+    }
+
+    .error {
+        text-align: center;
+        padding: 80px;
+        color: red;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<section class="hero">
+    <h1>Nette's Corner Shop</h1>
+    <p>Faith • Growth • Purpose</p>
+</section>
+
+<div class="products-container">
+    <div id="loading" class="loading">
+        Loading products...
+    </div>
+
+    <div id="products" class="products-grid"></div>
+</div>
+
+<script>
+
+    async function loadProducts() {
+
+        try {
+
+            const response = await fetch('/.netlify/functions/products');
+            const products = await response.json();
+
+            document.getElementById('loading').style.display = 'none';
+
+            const container = document.getElementById('products');
+
+            products.forEach(product => {
+
+                const card = document.createElement('div');
+
+                card.className = 'product-card';
+
+                card.innerHTML = `
+                    <img
+                        src="${product.image}"
+                        alt="${product.title}"
+                        class="product-image"
+                    >
+
+                    <div class="product-content">
+
+                        <h3 class="product-title">
+                            ${product.title}
+                        </h3>
+
+                        <div class="product-price">
+                            $${product.price.toFixed(2)}
+                        </div>
+
+                        <a
+                            href="product.html?id=${product.id}"
+                            class="view-btn"
+                        >
+                            View Product
+                        </a>
+
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+            });
+
+        } catch(error) {
+
+            console.error(error);
+
+            document.getElementById('loading').innerHTML = `
+                <div class="error">
+                    Unable to load products right now.
+                </div>
+            `;
+        }
+    }
+
+    loadProducts();
+
+</script>
+```
+
+</body>
+</html>
