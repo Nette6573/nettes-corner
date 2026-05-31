@@ -1,9 +1,7 @@
 exports.handler = async () => {
   try {
-    const shopId = "27748943";
-
     const response = await fetch(
-      `https://api.printify.com/v1/shops/${shopId}/products.json`,
+      "https://api.printify.com/v1/shops/27748943/products.json",
       {
         headers: {
           Authorization: `Bearer ${process.env.PRINTIFY_API_TOKEN}`
@@ -13,12 +11,24 @@ exports.handler = async () => {
 
     const data = await response.json();
 
+    const products = data.data.map(product => ({
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      image: product.images?.[0]?.src || "",
+      visible: product.visible,
+      price:
+        product.variants?.find(v => v.is_enabled)?.price / 100 ||
+        product.variants?.[0]?.price / 100 ||
+        0
+    }));
+
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(products)
     };
   } catch (error) {
     return {
