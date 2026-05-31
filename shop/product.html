@@ -184,7 +184,7 @@ document.getElementById('productContainer').innerHTML=`
 <div class="price">$${product.price.toFixed(2)}</div>
 
 <p class="description">
-${product.description || 'Faith-inspired product from Nette\\'s Corner.'}
+${product.description ? product.description : "Faith-inspired product from Nette's Corner."}
 </p>
 
 <div class="selector">
