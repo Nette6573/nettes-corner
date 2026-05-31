@@ -169,6 +169,34 @@ document.getElementById('productContainer').innerHTML=
 return;
 }
 
+let optionsHtml = "";
+
+if(product.options){
+
+    product.options.forEach(option => {
+
+        optionsHtml += `
+            <div class="selector">
+
+                <label>${option.name}</label>
+
+                <select id="option-${option.name}">
+
+                    ${option.values.map(value => `
+
+                        <option value="${value.id}">
+                            ${value.title}
+                        </option>
+
+                    `).join("")}
+
+                </select>
+
+            </div>
+        `;
+    });
+}
+
 document.getElementById('productContainer').innerHTML=`
 
 <div class="product-layout">
@@ -186,6 +214,12 @@ document.getElementById('productContainer').innerHTML=`
 <p class="description">
 ${product.description ? product.description : "Faith-inspired product from Nette's Corner."}
 </p>
+
+<div id="productOptions">
+
+    ${optionsHtml}
+
+</div>
 
 <div class="selector">
 <label>Quantity</label>
@@ -209,14 +243,32 @@ function addToCart(productId){
 
 const qty=parseInt(document.getElementById('qty').value)||1;
 
+const selectedOptions = {};
+
+document
+.querySelectorAll('#productOptions select')
+.forEach(select => {
+
+    selectedOptions[select.id] = select.value;
+
+});
+
 const cart=JSON.parse(localStorage.getItem('cart')||'[]');
 
 const existing=cart.find(item=>item.id===productId);
 
 if(existing){
-existing.qty+=qty;
+
+    existing.qty += qty;
+
 }else{
-cart.push({id:productId,qty:qty});
+
+    cart.push({
+        id: productId,
+        qty: qty,
+        options: selectedOptions
+    });
+
 }
 
 localStorage.setItem('cart',JSON.stringify(cart));
