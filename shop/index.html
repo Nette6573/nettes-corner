@@ -247,9 +247,9 @@
   <nav class="nav" id="nav">
     <a href="../index.html" class="nav-logo">Nette<span>'s Corner</span></a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="about.html">About</a></li>
-      <li><a href="blog.html">Blog</a></li>
-      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="../blog/about.html">About</a></li>
+      <li><a href="../blog/blog.html">Blog</a></li>
+      <li><a href="products.html" class="active">Products</a></li>
       <li><a href="../index.html#newsletter" class="nav-cta">Join the Community</a></li>
     </ul>
     <div class="hamburger" id="hamburger" onclick="toggleNav()">
@@ -290,13 +290,20 @@
       </h1>
 
       <p class="shop-hero-sub">
-        The Nette's Corner shop is being built with intention — pieces that carry real meaning, not just a price tag. Faith. Growth. Purpose. Everyday life.
+        Discover apparel and accessories designed to inspire faith, growth, resilience, and purpose. Every piece carries a message meant to encourage your journey.
       </p>
 
       <div class="cs-badge">
-        <div class="cs-badge-dot"></div>
-        Opening Soon
-      </div>
+  <div class="cs-badge-dot"></div>
+  Shop Now Open
+</div>
+
+<div style="margin-top:2rem;">
+  <a href="/shop/products.html" class="ea-btn">
+    Shop Collection
+  </a>
+</div>
+
 
       <div class="launch-teaser">
         <div class="teaser-box">
@@ -318,8 +325,8 @@
       </div>
 
       <div class="early-access">
-        <div class="ea-title">Get early access 🤍</div>
-        <p class="ea-sub">Be the first to know when the shop opens — and get an exclusive discount when it does.</p>
+        <div class="ea-title">Stay Connected 🤍</div>
+        <p class="ea-sub">Get updates on new arrivals, special offers, and inspirational collections.</p>
         <div class="ea-form">
           <input class="ea-input" type="email" placeholder="Your email address" id="earlyEmail" />
           <button class="ea-btn" onclick="earlySignup(this)">Notify Me</button>
@@ -328,36 +335,35 @@
     </div>
   </section>
 
-  <!-- ── WHAT'S COMING ── -->
-  <section class="coming-section">
-    <div class="container">
-      <div class="section-header-center reveal">
-        <span class="tag">What's Coming</span>
-        <h2 class="section-heading">Made for the <em>journey.</em></h2>
-        <p class="section-sub">Every piece in the Nette's Corner shop will be designed to carry a message — something you'd actually want to wear or display in your space.</p>
-      </div>
-      <div class="coming-grid">
-        <div class="coming-card reveal" style="transition-delay:0.05s">
-          <div class="coming-card-icon">👕</div>
-          <div class="coming-card-name">Graphic T-Shirts</div>
-          <p class="coming-card-desc">Soft, quality tees with phrases that reflect the Nette's Corner ethos. Faith. Growth. Purpose. Words you'd want on your chest.</p>
-          <span class="coming-badge">✦ Coming First</span>
-        </div>
-        <div class="coming-card reveal" style="transition-delay:0.1s">
-          <div class="coming-card-icon">🖼️</div>
-          <div class="coming-card-name">Prints & Wall Art</div>
-          <p class="coming-card-desc">Beautifully designed quote prints to put in your space. Reminders of who you're becoming — for your wall, your desk, your mirror.</p>
-          <span class="coming-badge">Coming Soon</span>
-        </div>
-        <div class="coming-card reveal" style="transition-delay:0.15s">
-          <div class="coming-card-icon">📓</div>
-          <div class="coming-card-name">Journals & Stationery</div>
-          <p class="coming-card-desc">For the ones who process through writing. Guided journals, notebooks, and intentional stationery to support your growth journey.</p>
-          <span class="coming-badge">Coming Soon</span>
-        </div>
-      </div>
+ <section class="coming-section">
+  <div class="container">
+
+    <div class="section-header-center reveal">
+      <span class="tag">Featured Collection</span>
+
+      <h2 class="section-heading">
+        Designed for the <em>journey.</em>
+      </h2>
+
+      <p class="section-sub">
+        Apparel and accessories inspired by faith,
+        growth, purpose, and everyday life.
+      </p>
     </div>
-  </section>
+
+    <div id="featuredProducts"
+         class="coming-grid">
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;">
+      <a href="/shop/products.html"
+         class="ea-btn">
+         View All Products
+      </a>
+    </div>
+
+  </div>
+</section>
 
   <!-- ── VALUES BANNER ── -->
   <section class="values-banner">
@@ -457,7 +463,49 @@
     }, { threshold: 0.08 });
     reveals.forEach(el => obs.observe(el));
 
-    function earlySignup(btn) {
+    
+async function loadFeaturedProducts() {
+
+  try {
+
+    const response = await fetch('/.netlify/functions/products');
+    const products = await response.json();
+
+    const container = document.getElementById('featuredProducts');
+    if(!container) return;
+
+    products.slice(0, 6).forEach(product => {
+
+      container.innerHTML += `
+        <div class="coming-card reveal">
+
+          <img
+            src="${product.image}"
+            alt="${product.title}"
+            style="width:100%;height:250px;object-fit:cover;margin-bottom:1rem;">
+
+          <div class="coming-card-name">${product.title}</div>
+
+          <div style="color:#6D5A6D;font-weight:bold;margin:1rem 0;font-size:1.1rem;">
+            $${product.price}
+          </div>
+
+          <a href="/shop/product.html?id=${product.id}" class="ea-btn">
+            View Product
+          </a>
+
+        </div>`;
+    });
+
+  } catch(error) {
+    console.error(error);
+  }
+}
+
+loadFeaturedProducts();
+
+
+function earlySignup(btn) {
       const email = document.getElementById('earlyEmail').value;
       if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
       btn.textContent = '✓ You\'re on the list!';
