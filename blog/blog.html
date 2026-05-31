@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Nette's Corner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --plum:      #6D5A6D;
+      --blush:     #DDB6BB;
+      --cream:     #E9DED3;
+      --ivory:     #FAF7F2;
+      --dark:      #4A3F3A;
+      --white:     #FFFFFF;
+      --soft:      #7a6b65;
+      --shadow:    rgba(74,63,58,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; background: var(--ivory); color: var(--dark); overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 2rem; }
+
+    .tag {
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--plum);
+    }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ════════════════════════════
+       NAV
+    ════════════════════════════ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1.2rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(250,247,242,0.90);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(221,182,187,0.3);
+      transition: box-shadow 0.3s;
+    }
+    .nav.scrolled { box-shadow: 0 2px 20px var(--shadow); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700; color: var(--dark); }
+    .nav-logo span { color: var(--plum); font-style: italic; }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--plum); }
+    .nav-cta {
+      background: var(--plum); color: var(--white) !important;
+      padding: 0.55rem 1.3rem; border-radius: 2px;
+      font-size: 0.72rem !important; font-weight: 600 !important;
+      letter-spacing: 0.14em !important; transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--dark) !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: var(--dark); transition: 0.3s; }
+
+    /* ════════════════════════════
+       BLOG HERO
+    ════════════════════════════ */
+    .blog-hero {
+      padding: 9rem 0 5rem;
+      background: linear-gradient(160deg, #f5ede4 0%, #efe3d8 50%, #e6d5c8 100%);
+      position: relative; overflow: hidden;
+    }
+    .blog-hero::after {
+      content: '';
+      position: absolute; right: -100px; top: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(221,182,187,0.35) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .blog-hero-inner { position: relative; z-index: 1; }
+    .blog-hero-eyebrow { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; }
+    .eyebrow-line { width: 36px; height: 1px; background: var(--plum); }
+    .blog-hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 700; line-height: 1.1;
+      color: var(--dark); margin-bottom: 1.2rem;
+    }
+    .blog-hero-title em { font-style: italic; color: var(--plum); }
+    .blog-hero-sub {
+      font-size: 1rem; font-weight: 300; line-height: 1.8;
+      color: var(--soft); max-width: 520px;
+    }
+
+    /* ════════════════════════════
+       FILTER BAR
+    ════════════════════════════ */
+    .filter-bar {
+      background: var(--white);
+      border-bottom: 1px solid rgba(221,182,187,0.25);
+      padding: 0;
+      position: sticky; top: 68px; z-index: 50;
+      box-shadow: 0 2px 12px rgba(74,63,58,0.06);
+    }
+    .filter-inner {
+      display: flex; align-items: center;
+      gap: 0; overflow-x: auto;
+    }
+    .filter-btn {
+      padding: 1rem 1.5rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--soft); background: none; border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer; white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .filter-btn:hover { color: var(--plum); }
+    .filter-btn.active { color: var(--plum); border-bottom-color: var(--plum); }
+
+    /* ════════════════════════════
+       MAIN LAYOUT
+    ════════════════════════════ */
+    .blog-layout {
+      padding: 4rem 0 6rem;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    /* ════════════════════════════
+       FEATURED POST (top)
+    ════════════════════════════ */
+    .featured-post {
+      margin-bottom: 3rem;
+    }
+    .featured-card {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      background: var(--white);
+      border: 1px solid rgba(221,182,187,0.2);
+      overflow: hidden;
+      transition: box-shadow 0.3s, transform 0.3s;
+      cursor: pointer;
+    }
+    .featured-card:hover {
+      box-shadow: 0 16px 48px var(--shadow);
+      transform: translateY(-4px);
+    }
+    .featured-thumb {
+      width: 100%; aspect-ratio: 4/3;
+      overflow: hidden; position: relative;
+    }
+    .featured-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .featured-card:hover .featured-thumb img { transform: scale(1.05); }
+    .featured-badge {
+      position: absolute; top: 1.2rem; left: 1.2rem;
+      background: var(--plum); color: var(--white);
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 0.35rem 0.8rem;
+    }
+    .featured-body {
+      padding: 2.5rem 2rem 2rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .post-meta { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .cat-badge {
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--plum); background: rgba(109,90,109,0.08);
+      padding: 0.25rem 0.7rem; border-radius: 1px;
+    }
+    .meta-sep { width: 3px; height: 3px; background: var(--blush); border-radius: 50%; }
+    .meta-date { font-size: 0.72rem; color: var(--soft); }
+    .meta-read { font-size: 0.72rem; color: var(--soft); }
+
+    .post-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem; font-weight: 700;
+      line-height: 1.3; color: var(--dark);
+      margin-bottom: 0.9rem;
+      transition: color 0.2s;
+    }
+    .featured-card:hover .post-title { color: var(--plum); }
+    .post-excerpt {
+      font-size: 0.85rem; font-weight: 300;
+      line-height: 1.8; color: var(--soft);
+      margin-bottom: 1.5rem;
+    }
+    .read-link {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--plum);
+      transition: gap 0.2s;
+    }
+    .read-link:hover { gap: 0.9rem; }
+    .read-link::after { content: '→'; }
+
+    /* ════════════════════════════
+       POST GRID
+    ════════════════════════════ */
+    .section-label {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1.8rem;
+    }
+    .sl-line { flex: 1; height: 1px; background: rgba(221,182,187,0.4); }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.8rem;
+    }
+    .post-card {
+      background: var(--white);
+      border: 1px solid rgba(221,182,187,0.2);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .post-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px var(--shadow);
+    }
+    .card-thumb {
+      width: 100%; aspect-ratio: 16/9;
+      overflow: hidden;
+    }
+    .card-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .post-card:hover .card-thumb img { transform: scale(1.05); }
+    .card-body { padding: 1.4rem 1.5rem 1.6rem; }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 600;
+      line-height: 1.35; color: var(--dark);
+      margin-bottom: 0.6rem;
+      transition: color 0.2s;
+    }
+    .post-card:hover .card-title { color: var(--plum); }
+    .card-excerpt {
+      font-size: 0.8rem; font-weight: 300;
+      line-height: 1.75; color: var(--soft);
+      margin-bottom: 1.1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ════════════════════════════
+       SIDEBAR
+    ════════════════════════════ */
+    .sidebar { position: sticky; top: 120px; }
+
+    .sidebar-block {
+      background: var(--white);
+      border: 1px solid rgba(221,182,187,0.2);
+      padding: 1.8rem;
+      margin-bottom: 2rem;
+    }
+    .sidebar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--dark); margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(221,182,187,0.3);
+    }
+
+    /* Newsletter sidebar */
+    .sb-nl-icon { font-size: 1.8rem; margin-bottom: 0.6rem; }
+    .sb-nl-text {
+      font-size: 0.82rem; line-height: 1.7;
+      color: var(--soft); margin-bottom: 1.2rem;
+    }
+    .sb-input {
+      width: 100%; background: var(--ivory);
+      border: 1px solid rgba(109,90,109,0.2);
+      padding: 0.75rem 1rem; font-family: 'Poppins', sans-serif;
+      font-size: 0.82rem; color: var(--dark);
+      outline: none; margin-bottom: 0.8rem;
+      transition: border-color 0.2s;
+    }
+    .sb-input:focus { border-color: var(--plum); }
+    .sb-input::placeholder { color: var(--soft); opacity: 0.6; }
+    .sb-btn {
+      width: 100%; background: var(--plum);
+      color: var(--white); border: none;
+      padding: 0.8rem; font-family: 'Poppins', sans-serif;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .sb-btn:hover { background: var(--dark); }
+
+    /* Categories */
+    .cat-list { display: flex; flex-direction: column; gap: 0; }
+    .cat-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid rgba(221,182,187,0.2);
+      font-size: 0.82rem; cursor: pointer;
+      transition: color 0.2s;
+    }
+    .cat-item:last-child { border-bottom: none; }
+    .cat-item:hover { color: var(--plum); }
+    .cat-count {
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--plum); background: rgba(109,90,109,0.08);
+      padding: 0.15rem 0.5rem;
+    }
+
+    /* Recent posts sidebar */
+    .sb-recent-post {
+      display: flex; gap: 0.9rem; align-items: flex-start;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(221,182,187,0.2);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .sb-recent-post:last-child { border-bottom: none; }
+    .sb-recent-post:hover .sb-rp-title { color: var(--plum); }
+    .sb-rp-thumb {
+      width: 60px; height: 50px; flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sb-rp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .sb-rp-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.82rem; font-weight: 600;
+      line-height: 1.35; color: var(--dark);
+      margin-bottom: 0.25rem;
+      transition: color 0.2s;
+    }
+    .sb-rp-date { font-size: 0.68rem; color: var(--soft); }
+
+    /* Quote block */
+    .sidebar-quote {
+      background: linear-gradient(135deg, #f0e3d8, #e8d8cc);
+      border: 1px solid rgba(221,182,187,0.3);
+      padding: 1.8rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .sq-mark { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--blush); line-height: 0.5; margin-bottom: 0.8rem; }
+    .sq-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic; font-size: 0.92rem;
+      line-height: 1.65; color: var(--dark);
+    }
+    .sq-attr { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-top: 0.8rem; }
+
+    /* Social links */
+    .sb-social { display: flex; gap: 0.7rem; }
+    .sb-soc-link {
+      flex: 1; padding: 0.7rem;
+      border: 1px solid rgba(221,182,187,0.4);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--soft); text-align: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sb-soc-link:hover { background: var(--plum); color: var(--white); border-color: var(--plum); }
+
+    /* ════════════════════════════
+       LOAD MORE
+    ════════════════════════════ */
+    .load-more-wrap { text-align: center; margin-top: 3rem; }
+    .load-more-btn {
+      background: transparent;
+      border: 2px solid var(--plum);
+      color: var(--plum);
+      padding: 0.9rem 2.5rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s;
+    }
+    .load-more-btn:hover { background: var(--plum); color: var(--white); }
+
+    /* ════════════════════════════
+       FOOTER
+    ════════════════════════════ */
+    .footer {
+      background: var(--dark); padding: 4rem 0 2rem;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem; padding-bottom: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 2rem;
+    }
+    .footer-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700; color: var(--ivory);
+      margin-bottom: 0.7rem;
+    }
+    .footer-brand-name span { color: var(--blush); font-style: italic; }
+    .footer-brand-desc {
+      font-size: 0.82rem; line-height: 1.75;
+      color: rgba(250,247,242,0.45); max-width: 260px; margin-bottom: 1.4rem;
+    }
+    .social-links { display: flex; gap: 0.8rem; }
+    .social-link {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; color: rgba(250,247,242,0.5);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .social-link:hover { border-color: var(--blush); color: var(--blush); }
+    .footer-col-title {
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(250,247,242,0.35); margin-bottom: 1.2rem;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-links a { font-size: 0.82rem; color: rgba(250,247,242,0.55); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--blush); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .footer-copy { font-size: 0.72rem; color: rgba(250,247,242,0.28); }
+    .footer-heart { color: var(--blush); }
+
+    /* ════════════════════════════
+       RESPONSIVE
+    ════════════════════════════ */
+    @media (max-width: 1000px) {
+      .blog-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .sidebar { position: static; }
+    }
+    @media (max-width: 700px) {
+      .featured-card { grid-template-columns: 1fr; }
+      .featured-thumb { aspect-ratio: 16/9; }
+      .posts-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; flex-direction: column;
+        position: fixed; top: 62px; left: 0; right: 0;
+        background: var(--ivory); padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(221,182,187,0.3); z-index: 99;
+      }
+      .hamburger { display: flex; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ────────────────────────── -->
+  <nav class="nav" id="nav">
+    <a href="../index.html" class="nav-logo">Nette<span>'s Corner</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="about.html">About</a></li>
+      <li><a href="blog.html" class="active">Blog</a></li>
+      <li><a href="#">Shop</a></li>
+      <li><a href="../index.html#newsletter" class="nav-cta">Join the Community</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ── BLOG HERO ────────────────────────── -->
+  <section class="blog-hero">
+    <div class="container">
+      <div class="blog-hero-inner">
+        <div class="blog-hero-eyebrow">
+          <div class="eyebrow-line"></div>
+          <span class="tag">Nette's Corner</span>
+        </div>
+        <h1 class="blog-hero-title">Words for the <em>journey.</em></h1>
+        <p class="blog-hero-sub">Honest writing on growth, faith, healing, and the everyday work of becoming who you're meant to be.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FILTER BAR ────────────────────── -->
+  <div class="filter-bar">
+    <div class="container">
+      <div class="filter-inner">
+        <button class="filter-btn active" onclick="filterPosts('all', this)">All Posts</button>
+        <button class="filter-btn" onclick="filterPosts('growth', this)">Growth & Motivation</button>
+        <button class="filter-btn" onclick="filterPosts('healing', this)">Healing</button>
+        <button class="filter-btn" onclick="filterPosts('relationships', this)">Relationships</button>
+        <button class="filter-btn" onclick="filterPosts('books', this)">Books</button>
+        <button class="filter-btn" onclick="filterPosts('mindset', this)">Mindset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN CONTENT ────────────────── -->
+  <div class="container">
+    <div class="blog-layout">
+
+      <!-- LEFT: Posts -->
+      <main>
+
+        <!-- FEATURED POST -->
+        <div class="featured-post reveal">
+          <div class="section-label">
+            <span class="tag">Featured</span>
+            <div class="sl-line"></div>
+          </div>
+          <a href="post-motivation.html" class="featured-card" data-cat="growth">
+            <div class="featured-thumb">
+              <img
+                src="../images/Motivation.png"
+                alt="Why Motivation Isn't Enough"
+                loading="eager"
+              />
+              <div class="featured-badge">✦ Latest</div>
+            </div>
+            <div class="featured-body">
+              <div class="post-meta">
+                <span class="cat-badge">Growth</span>
+                <div class="meta-sep"></div>
+                <span class="meta-date">May 19, 2025</span>
+                <div class="meta-sep"></div>
+                <span class="meta-read">5 min read</span>
+              </div>
+              <h2 class="post-title">Why Motivation Isn't Enough (And What Actually Works)</h2>
+              <p class="post-excerpt">Motivation is real, but it's also deeply unreliable. Here's the honest answer to why we start strong on a goal and then quietly fall apart — and what discipline, structure, and identity have to do with it.</p>
+              <span class="read-link">Read Article</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- ALL POSTS GRID -->
+        <div>
+          <div class="section-label reveal">
+            <span class="tag">All Posts</span>
+            <div class="sl-line"></div>
+          </div>
+
+          <div class="posts-grid" id="postsGrid">
+
+            <!-- Post 2 -->
+            <a href="post-emotional-bonds.html" class="post-card reveal" data-cat="relationships" style="transition-delay:0.05s">
+              <div class="card-thumb">
+                <img
+                  src="../images/Healing.png"
+                  alt="Unhealthy Emotional Bonds"
+                  loading="lazy"
+                />
+              </div>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="cat-badge">Relationships</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-date">May 19, 2025</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-read">3 min</span>
+                </div>
+                <h3 class="card-title">Why We Form Unhealthy Emotional Bonds</h3>
+                <p class="card-excerpt">Sometimes what we call love is actually attachment — and sometimes what we hold onto is quietly hurting us. Understanding the roots of unhealthy bonds is the first step toward healing them.</p>
+                <span class="read-link">Read Article</span>
+              </div>
+            </a>
+
+            <!-- Post 3 -->
+            <a href="post-loss.html" class="post-card reveal" data-cat="healing" style="transition-delay:0.10s">
+              <div class="card-thumb">
+                <img
+                  src="../images/After_loss.png"
+                  alt="Learning to Live After Loss"
+                  loading="lazy"
+                />
+              </div>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="cat-badge">Healing</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-date">May 19, 2025</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-read">3 min</span>
+                </div>
+                <h3 class="card-title">Learning to Live After Loss</h3>
+                <p class="card-excerpt">No matter how much comfort surrounds you, you are the one left to face the silence, the memories, and the emptiness. This is for anyone still learning to carry what they've lost.</p>
+                <span class="read-link">Read Article</span>
+              </div>
+            </a>
+
+            <!-- Post 4 -->
+            <a href="post-perspective.html" class="post-card reveal" data-cat="mindset" style="transition-delay:0.15s">
+              <img style="display:none" src="" alt=""/>
+              <div class="card-thumb" style="background: linear-gradient(135deg, #c8b8a4 0%, #ddd0c0 100%); display:flex; align-items:center; justify-content:center; aspect-ratio:16/9;">
+                <img
+                  src="../images/shake_up_your_life.png"
+                  alt="Shake Up Your Life"
+                  loading="lazy"
+                  style="width:100%;height:100%;object-fit:cover;"
+                />
+              </div>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="cat-badge">Mindset</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-date">Jul 19, 2022</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-read">4 min</span>
+                </div>
+                <h3 class="card-title">Shake Up Your Life: Changing Your Perspective When Life Feels Stuck</h3>
+                <p class="card-excerpt">Changing your perspective isn't just about "thinking positive." It requires unlearning, reflecting, and sometimes confronting the parts of yourself you've been quietly avoiding.</p>
+                <span class="read-link">Read Article</span>
+              </div>
+            </a>
+
+            <!-- Post 5 -->
+            <a href="post-letting-go.html" class="post-card reveal" data-cat="growth" style="transition-delay:0.20s">
+              <div class="card-thumb">
+                <img
+                  src="../images/letting_go.png"
+                  alt="Letting Go Isn't Easy"
+                  loading="lazy"
+                />
+              </div>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="cat-badge">Growth</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-date">Jul 19, 2022</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-read">6 min</span>
+                </div>
+                <h3 class="card-title">Letting Go Isn't Easy, But It's Necessary for Growth</h3>
+                <p class="card-excerpt">We hold on to people, memories, old versions of ourselves that no longer fit. Even when it hurts, even when it drains us — we hesitate. Because letting go feels like losing. But holding on can cost even more.</p>
+                <span class="read-link">Read Article</span>
+              </div>
+            </a>
+
+            <!-- Post 6 -->
+            <a href="post-books.html" class="post-card reveal" data-cat="books" style="transition-delay:0.25s">
+              <div class="card-thumb">
+                <img
+                  src="../images/20_books.png"
+                  alt="20 Books You Should Read"
+                  loading="lazy"
+                />
+              </div>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="cat-badge">Books</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-date">Jul 19, 2022</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-read">3 min</span>
+                </div>
+                <h3 class="card-title">20 Books You Should Read in Your Twenties (and Why They Matter)</h3>
+                <p class="card-excerpt">Books have the power to reframe how we think, act, and grow. Here are 20 titles that can expand your mindset, build motivation, and help you develop mentally, emotionally, and spiritually.</p>
+                <span class="read-link">Read Article</span>
+              </div>
+            </a>
+
+          </div><!-- /posts-grid -->
+
+          <div class="load-more-wrap reveal">
+            <button class="load-more-btn">More Posts Coming Soon</button>
+          </div>
+        </div>
+
+      </main><!-- /main -->
+
+      <!-- RIGHT: Sidebar -->
+      <aside class="sidebar">
+
+        <!-- Newsletter -->
+        <div class="sidebar-block reveal" style="transition-delay:0.1s">
+          <div class="sb-nl-icon">🤍</div>
+          <div class="sidebar-title">Stay Inspired</div>
+          <p class="sb-nl-text">New posts, motivation, and more — straight to your inbox. No spam.</p>
+          <input class="sb-input" type="text" placeholder="First name" />
+          <input class="sb-input" type="email" placeholder="Email address" />
+          <button class="sb-btn" onclick="this.textContent='✓ You\'re in!'; this.style.background='#4A3F3A'">Join the Community</button>
+        </div>
+
+        <!-- Quote -->
+        <div class="sidebar-quote reveal" style="transition-delay:0.15s">
+          <div class="sq-mark">"</div>
+          <p class="sq-text">Real change lives in the quiet, unsexy, ordinary moments — the ones nobody posts about.</p>
+          <p class="sq-attr">— Nette's Corner</p>
+        </div>
+
+        <!-- Categories -->
+        <div class="sidebar-block reveal" style="transition-delay:0.2s">
+          <div class="sidebar-title">Browse Topics</div>
+          <div class="cat-list">
+            <div class="cat-item" onclick="filterPosts('all', null)">All Posts <span class="cat-count">6</span></div>
+            <div class="cat-item" onclick="filterPosts('growth', null)">Growth & Motivation <span class="cat-count">2</span></div>
+            <div class="cat-item" onclick="filterPosts('healing', null)">Healing <span class="cat-count">1</span></div>
+            <div class="cat-item" onclick="filterPosts('relationships', null)">Relationships <span class="cat-count">1</span></div>
+            <div class="cat-item" onclick="filterPosts('mindset', null)">Mindset <span class="cat-count">1</span></div>
+            <div class="cat-item" onclick="filterPosts('books', null)">Books <span class="cat-count">1</span></div>
+          </div>
+        </div>
+
+        <!-- Recent Posts -->
+        <div class="sidebar-block reveal" style="transition-delay:0.25s">
+          <div class="sidebar-title">Recent Posts</div>
+          <a href="post-motivation.html" class="sb-recent-post">
+            <div class="sb-rp-thumb">
+              <img src="../images/Motivation.png" alt="Motivation" loading="lazy"/>
+            </div>
+            <div>
+              <div class="sb-rp-title">Why Motivation Isn't Enough</div>
+              <div class="sb-rp-date">May 19, 2025</div>
+            </div>
+          </a>
+          <a href="post-emotional-bonds.html" class="sb-recent-post">
+            <div class="sb-rp-thumb">
+              <img src="../images/Healing.png" alt="Emotional Bonds" loading="lazy"/>
+            </div>
+            <div>
+              <div class="sb-rp-title">Why We Form Unhealthy Emotional Bonds</div>
+              <div class="sb-rp-date">May 19, 2025</div>
+            </div>
+          </a>
+          <a href="post-loss.html" class="sb-recent-post">
+            <div class="sb-rp-thumb">
+              <img src="../images/After_loss.png" alt="Loss" loading="lazy"/>
+            </div>
+            <div>
+              <div class="sb-rp-title">Learning to Live After Loss</div>
+              <div class="sb-rp-date">May 19, 2025</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Social -->
+        <div class="sidebar-block reveal" style="transition-delay:0.3s">
+          <div class="sidebar-title">Follow Along</div>
+          <div class="sb-social">
+            <a href="https://www.facebook.com/nettescorner20-102518129322497/" class="sb-soc-link">Facebook</a>
+            <a href="https://instagram.com/nettescorner20" class="sb-soc-link">Instagram</a>
+          </div>
+        </div>
+
+      </aside>
+    </div><!-- /blog-layout -->
+  </div><!-- /container -->
+
+  <!-- ── FOOTER ────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-name">Nette<span>'s Corner</span></div>
+          <p class="footer-brand-desc">Your space for encouragement, reflection, and growth. One day at a time.</p>
+          <div class="social-links">
+            <a href="https://www.facebook.com/nettescorner20-102518129322497/" class="social-link">f</a>
+            <a href="https://instagram.com/nettescorner20" class="social-link">ig</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-title">Explore</div>
+          <ul class="footer-links">
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="#">Shop (Coming Soon)</a></li>
+            <li><a href="../index.html#newsletter">Newsletter</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Topics</div>
+          <ul class="footer-links">
+            <li><a href="#">Growth & Motivation</a></li>
+            <li><a href="#">Faith & Healing</a></li>
+            <li><a href="#">Relationships</a></li>
+            <li><a href="#">Books & Reading</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 Nette's Corner. Made with <span class="footer-heart">♥</span></p>
+        <p class="footer-copy">Contact: <a href="tel:+18763143608" style="color:rgba(250,247,242,0.35)">+1 876 314 3608</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Mobile nav
+    function toggleNav() {
+      document.getElementById('navLinks').classList.toggle('open');
+    }
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Category filter
+    function filterPosts(cat, btn) {
+      // Update active button
+      if (btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      const cards = document.querySelectorAll('.post-card, .featured-card');
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-cat');
+        const show = cat === 'all' || cardCat === cat;
+        card.style.opacity    = show ? '1' : '0.25';
+        card.style.pointerEvents = show ? 'all' : 'none';
+        card.style.transform  = show ? '' : 'scale(0.97)';
+        card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+      });
+    }
+  </script>
+</body>
+</html>
