@@ -1,2 +1,12 @@
 [functions]
-directory = "netlify/functions"
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/shop"
+  to = "/shop/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/shop/products"
+  to = "/shop/products.html"
+  status = 200

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout — Nette's Corner</title>
+  <link rel="icon" type="image/png" href="/images/NettesCorner.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AYO8mjsHXMC5eHLRvvs8RYxU_27jg91YXzdey9JcpgLJWI68Jsr56ecmr5E3s1tWOueyCAZc_jiNhffy&currency=USD"></script>
+  <style>
+    :root{--plum:#6D5A6D;--blush:#DDB6BB;--cream:#E9DED3;--ivory:#FAF7F2;--dark:#4A3F3A;--white:#fff;--soft:#7a6b65;--shadow:rgba(74,63,58,0.10)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Poppins',sans-serif;background:var(--ivory);color:var(--dark)}
+    a{text-decoration:none;color:inherit}
+    img{display:block;max-width:100%}
+    .container{max-width:1160px;margin:0 auto;padding:0 2rem}
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.2rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(250,247,242,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(221,182,187,0.3)}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--dark)}
+    .nav-logo span{color:var(--plum);font-style:italic}
+    .back-link{font-size:0.75rem;font-weight:500;color:var(--soft);display:flex;align-items:center;gap:0.4rem;transition:color 0.2s}
+    .back-link:hover{color:var(--plum)}
+
+    /* PAGE */
+    .page-header{padding:8rem 0 3rem;text-align:center}
+    .page-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--dark)}
+    .page-title em{font-style:italic;color:var(--plum)}
+
+    /* STEPS */
+    .steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:3rem}
+    .step{display:flex;align-items:center;gap:0.5rem;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft)}
+    .step.active{color:var(--plum)}
+    .step.done{color:var(--dark)}
+    .step-num{width:26px;height:26px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700}
+    .step.done .step-num{background:var(--plum);border-color:var(--plum);color:var(--white)}
+    .step.active .step-num{background:var(--plum);border-color:var(--plum);color:var(--white)}
+    .step-line{width:60px;height:1px;background:rgba(221,182,187,0.4);margin:0 0.5rem}
+
+    /* LAYOUT */
+    .checkout-layout{display:grid;grid-template-columns:1fr 380px;gap:3rem;align-items:start;padding-bottom:6rem}
+
+    /* FORM */
+    .form-section{background:var(--white);border:1px solid rgba(221,182,187,0.2);padding:2rem}
+    .form-section-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(221,182,187,0.25)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+    .form-row.full{grid-template-columns:1fr}
+    .form-group{display:flex;flex-direction:column;gap:0.4rem}
+    .form-label{font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--dark)}
+    .form-input,.form-select{background:var(--ivory);border:1.5px solid rgba(74,63,58,0.15);padding:0.8rem 1rem;font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--dark);outline:none;transition:border-color 0.2s;width:100%}
+    .form-input:focus,.form-select:focus{border-color:var(--plum)}
+    .form-input::placeholder{color:var(--soft);opacity:0.6}
+    .form-input.error{border-color:#c0392b}
+    .error-msg{font-size:0.68rem;color:#c0392b;margin-top:2px;display:none}
+    .error-msg.show{display:block}
+
+    /* ORDER SUMMARY SIDEBAR */
+    .order-summary{background:var(--white);border:1px solid rgba(221,182,187,0.2);padding:2rem;position:sticky;top:100px}
+    .summary-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(221,182,187,0.25)}
+    .summary-item{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(221,182,187,0.15)}
+    .summary-item:last-of-type{border-bottom:none}
+    .sum-img{width:56px;height:56px;overflow:hidden;border:1px solid rgba(221,182,187,0.2);flex-shrink:0;position:relative}
+    .sum-img img{width:100%;height:100%;object-fit:cover}
+    .sum-qty-badge{position:absolute;top:-6px;right:-6px;background:var(--plum);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .sum-info{}
+    .sum-name{font-size:0.82rem;font-weight:500;color:var(--dark);line-height:1.3;margin-bottom:0.2rem}
+    .sum-variant{font-size:0.72rem;color:var(--soft)}
+    .sum-price{font-size:0.88rem;font-weight:600;color:var(--dark);margin-left:auto;white-space:nowrap}
+    .divider{height:1px;background:rgba(221,182,187,0.25);margin:1rem 0}
+    .summary-row{display:flex;justify-content:space-between;font-size:0.85rem;color:var(--soft);margin-bottom:0.6rem}
+    .summary-row.total{font-size:1rem;font-weight:700;color:var(--dark);margin-top:0.5rem;padding-top:0.8rem;border-top:1px solid rgba(221,182,187,0.25)}
+    .summary-row.total span:last-child{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--plum)}
+
+    /* PAYPAL */
+    .paypal-section{margin-top:1.5rem}
+    .paypal-divider{text-align:center;font-size:0.72rem;color:var(--soft);margin:1rem 0;position:relative}
+    .paypal-divider::before,.paypal-divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:rgba(221,182,187,0.3)}
+    .paypal-divider::before{left:0}.paypal-divider::after{right:0}
+    #paypal-button-container{margin-top:1rem}
+    .paypal-note{font-size:0.68rem;color:var(--soft);text-align:center;margin-top:0.8rem;line-height:1.5}
+
+    /* Validation alert */
+    .validation-alert{background:#fdf0f0;border:1px solid #f0c0c0;color:#c0392b;padding:0.8rem 1rem;font-size:0.8rem;margin-bottom:1rem;display:none}
+    .validation-alert.show{display:block}
+
+    .footer{background:var(--dark);padding:2rem 0}
+    .footer-bottom{display:flex;justify-content:center}
+    .footer-copy{font-size:0.72rem;color:rgba(250,247,242,0.28)}
+    .footer-heart{color:var(--blush)}
+
+    @media(max-width:900px){.checkout-layout{grid-template-columns:1fr}.order-summary{position:static}}
+    @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <a href="../index.html" class="nav-logo">Nette<span>'s Corner</span></a>
+  <a href="cart.html" class="back-link">← Back to Cart</a>
+</nav>
+
+<div class="page-header">
+  <h1 class="page-title">Check<em>out</em></h1>
+  <div class="steps">
+    <div class="step done"><div class="step-num">✓</div><span>Cart</span></div>
+    <div class="step-line"></div>
+    <div class="step active"><div class="step-num">2</div><span>Details</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num">3</div><span>Payment</span></div>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <div id="emptyRedirect" style="display:none;text-align:center;padding:4rem">
+      <p style="color:var(--soft);margin-bottom:1rem">Your cart is empty.</p>
+      <a href="products.html" style="color:var(--plum);font-weight:600">Browse Products →</a>
+    </div>
+    <div class="checkout-layout" id="checkoutLayout">
+      <!-- Shipping Form -->
+      <div>
+        <div class="validation-alert" id="validationAlert">Please fill in all required fields before continuing.</div>
+        <div class="form-section">
+          <div class="form-section-title">📦 Shipping Information</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name *</label>
+              <input class="form-input" id="firstName" type="text" placeholder="Jane"/>
+              <span class="error-msg" id="firstNameErr">Required</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name *</label>
+              <input class="form-input" id="lastName" type="text" placeholder="Smith"/>
+              <span class="error-msg" id="lastNameErr">Required</span>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input class="form-input" id="email" type="email" placeholder="jane@example.com"/>
+              <span class="error-msg" id="emailErr">Valid email required</span>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label class="form-label">Phone (optional)</label>
+              <input class="form-input" id="phone" type="tel" placeholder="+1 555 000 0000"/>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label class="form-label">Address Line 1 *</label>
+              <input class="form-input" id="address1" type="text" placeholder="123 Main Street"/>
+              <span class="error-msg" id="address1Err">Required</span>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label class="form-label">Address Line 2</label>
+              <input class="form-input" id="address2" type="text" placeholder="Apt, Suite, etc. (optional)"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">City *</label>
+              <input class="form-input" id="city" type="text" placeholder="Kingston"/>
+              <span class="error-msg" id="cityErr">Required</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">State / Parish</label>
+              <input class="form-input" id="state" type="text" placeholder="Surrey"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">ZIP / Postal Code *</label>
+              <input class="form-input" id="zip" type="text" placeholder="JMAKN01"/>
+              <span class="error-msg" id="zipErr">Required</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Country *</label>
+              <select class="form-select" id="country">
+                <option value="">Select country...</option>
+                <option value="JM" selected>Jamaica</option>
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="BB">Barbados</option>
+                <option value="TT">Trinidad & Tobago</option>
+                <option value="GY">Guyana</option>
+                <option value="BS">Bahamas</option>
+                <option value="AG">Antigua & Barbuda</option>
+                <option value="LC">Saint Lucia</option>
+                <option value="VC">St. Vincent & Grenadines</option>
+                <option value="GD">Grenada</option>
+                <option value="KN">Saint Kitts & Nevis</option>
+                <option value="DM">Dominica</option>
+                <option value="HT">Haiti</option>
+                <option value="DO">Dominican Republic</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="NL">Netherlands</option>
+                <option value="ES">Spain</option>
+                <option value="IT">Italy</option>
+                <option value="NZ">New Zealand</option>
+                <option value="SG">Singapore</option>
+                <option value="NG">Nigeria</option>
+                <option value="GH">Ghana</option>
+                <option value="ZA">South Africa</option>
+              </select>
+              <span class="error-msg" id="countryErr">Required</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary + PayPal -->
+      <div class="order-summary">
+        <div class="summary-title">Order Summary</div>
+        <div id="summaryItems"></div>
+        <div class="divider"></div>
+        <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal">$0.00</span></div>
+        <div class="summary-row"><span>Shipping</span><span>Calculated by Printify</span></div>
+        <div class="summary-row total"><span>Total</span><span id="summaryTotal">$0.00</span></div>
+        <div class="paypal-section">
+          <div class="paypal-divider">Pay securely with</div>
+          <div id="paypal-button-container"></div>
+          <p class="paypal-note">🔒 Your payment is processed securely by PayPal. Your card details are never shared with us.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Nette's Corner. Made with <span class="footer-heart">♥</span></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function getCart(){return JSON.parse(localStorage.getItem('nc_cart')||'[]')}
+
+function validate(){
+  let ok=true;
+  const fields=[
+    {id:'firstName',err:'firstNameErr',test:v=>v.trim().length>0},
+    {id:'lastName',err:'lastNameErr',test:v=>v.trim().length>0},
+    {id:'email',err:'emailErr',test:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},
+    {id:'address1',err:'address1Err',test:v=>v.trim().length>0},
+    {id:'city',err:'cityErr',test:v=>v.trim().length>0},
+    {id:'zip',err:'zipErr',test:v=>v.trim().length>0},
+    {id:'country',err:'countryErr',test:v=>v.trim().length>0},
+  ];
+  fields.forEach(f=>{
+    const val=document.getElementById(f.id).value;
+    const errEl=document.getElementById(f.err);
+    const inputEl=document.getElementById(f.id);
+    if(!f.test(val)){
+      errEl.classList.add('show');
+      inputEl.classList.add('error');
+      ok=false;
+    }else{
+      errEl.classList.remove('show');
+      inputEl.classList.remove('error');
+    }
+  });
+  return ok;
+}
+
+function getShipping(){
+  return{
+    firstName:document.getElementById('firstName').value.trim(),
+    lastName:document.getElementById('lastName').value.trim(),
+    email:document.getElementById('email').value.trim(),
+    phone:document.getElementById('phone').value.trim(),
+    address1:document.getElementById('address1').value.trim(),
+    address2:document.getElementById('address2').value.trim(),
+    city:document.getElementById('city').value.trim(),
+    state:document.getElementById('state').value.trim(),
+    zip:document.getElementById('zip').value.trim(),
+    country:document.getElementById('country').value.trim(),
+  };
+}
+
+function buildSummary(){
+  const cart=getCart();
+  if(!cart.length){
+    document.getElementById('emptyRedirect').style.display='block';
+    document.getElementById('checkoutLayout').style.display='none';
+    return;
+  }
+  const subtotal=cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  document.getElementById('summaryItems').innerHTML=cart.map(item=>`
+    <div class="summary-item">
+      <div class="sum-img">
+        <img src="${item.image}" alt="${item.title}" loading="lazy"/>
+        <div class="sum-qty-badge">${item.qty}</div>
+      </div>
+      <div class="sum-info">
+        <div class="sum-name">${item.title}</div>
+        <div class="sum-variant">${item.variantTitle||''}</div>
+      </div>
+      <div class="sum-price">$${(item.price*item.qty).toFixed(2)}</div>
+    </div>`).join('');
+  document.getElementById('summarySubtotal').textContent='$'+subtotal.toFixed(2);
+  document.getElementById('summaryTotal').textContent='$'+subtotal.toFixed(2);
+}
+
+buildSummary();
+
+// PayPal Buttons
+paypal.Buttons({
+  style:{
+    layout:'vertical',
+    color:'gold',
+    shape:'rect',
+    label:'pay',
+    height:45
+  },
+
+  onClick:function(data,actions){
+    if(!validate()){
+      document.getElementById('validationAlert').classList.add('show');
+      document.getElementById('validationAlert').scrollIntoView({behavior:'smooth',block:'center'});
+      return actions.reject();
+    }
+    document.getElementById('validationAlert').classList.remove('show');
+    return actions.resolve();
+  },
+
+  createOrder:function(data,actions){
+    const cart=getCart();
+    const subtotal=cart.reduce((s,i)=>s+(i.price*i.qty),0);
+    return actions.order.create({
+      purchase_units:[{
+        amount:{
+          value:subtotal.toFixed(2),
+          currency_code:'USD'
+        },
+        description:"Nette's Corner Order"
+      }]
+    });
+  },
+
+  onApprove:async function(data,actions){
+    const order=await actions.order.capture();
+    const cart=getCart();
+    const shipping=getShipping();
+
+    // Submit order to Printify via Netlify function
+    try{
+      const res=await fetch('/.netlify/functions/create-order',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          lineItems:cart.map(i=>({
+            productId:i.productId,
+            variantId:i.variantId,
+            quantity:i.qty
+          })),
+          shipping:shipping,
+          paypalOrderId:order.id
+        })
+      });
+      const result=await res.json();
+      if(result.success){
+        localStorage.removeItem('nc_cart');
+        // Store order info for success page
+        localStorage.setItem('nc_last_order',JSON.stringify({
+          orderId:result.orderId,
+          paypalId:order.id,
+          items:cart,
+          shipping:shipping,
+          total:cart.reduce((s,i)=>s+(i.price*i.qty),0)
+        }));
+        window.location.href='success.html';
+      }else{
+        alert('Payment received but order submission had an issue. Please contact us with PayPal ID: '+order.id);
+      }
+    }catch(e){
+      alert('Payment received (PayPal ID: '+order.id+'). Please contact us to confirm your order.');
+    }
+  },
+
+  onError:function(err){
+    console.error(err);
+    alert('Payment could not be processed. Please try again.');
+  }
+
+}).render('#paypal-button-container');
+</script>
+</body>
+</html>
