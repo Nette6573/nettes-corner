@@ -9,20 +9,22 @@ exports.handler = async () => {
       }
     );
 
-    const text = await response.text();
+    const data = await response.json();
 
     return {
-      statusCode: response.status,
+      statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
-      body: text
+      body: JSON.stringify(data, null, 2)
     };
-
-  } catch (err) {
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify(err)
+      body: JSON.stringify({
+        message: error.message,
+        stack: error.stack
+      })
     };
   }
 };
