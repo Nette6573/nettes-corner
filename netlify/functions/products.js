@@ -1,7 +1,7 @@
 exports.handler = async () => {
   try {
     const response = await fetch(
-      "https://api.printify.com/v1/shops/27748943/products.json?limit=100",
+      "https://api.printify.com/v1/shops/27748943/products.json?limit=50",
       {
         headers: {
           Authorization: `Bearer ${process.env.PRINTIFY_API_TOKEN}`
