@@ -494,6 +494,7 @@
         <button class="filter-btn" onclick="filterPosts('growth', this)">Growth & Motivation</button>
         <button class="filter-btn" onclick="filterPosts('healing', this)">Healing</button>
         <button class="filter-btn" onclick="filterPosts('relationships', this)">Relationships</button>
+        <button class="filter-btn" onclick="filterPosts('faith', this)">Faith</button>
         <button class="filter-btn" onclick="filterPosts('books', this)">Books</button>
         <button class="filter-btn" onclick="filterPosts('mindset', this)">Mindset</button>
       </div>
@@ -513,25 +514,25 @@
             <span class="tag">Featured</span>
             <div class="sl-line"></div>
           </div>
-          <a href="post-motivation.html" class="featured-card" data-cat="growth">
+          <a href="post-betrayal-forgiveness.html" class="featured-card" data-cat="relationships">
             <div class="featured-thumb">
               <img
-                src="../images/Motivation.png"
-                alt="Why Motivation Isn't Enough"
+                src="../images/whentrustbreaks.png"
+                alt="When Trust Breaks: Betrayal in Friendship vs. Betrayal in Love"
                 loading="eager"
               />
               <div class="featured-badge">✦ Latest</div>
             </div>
             <div class="featured-body">
               <div class="post-meta">
-                <span class="cat-badge">Growth</span>
+                <span class="cat-badge">Relationships</span>
                 <div class="meta-sep"></div>
-                <span class="meta-date">May 19, 2025</span>
+                <span class="meta-date">Aug 6, 2026</span>
                 <div class="meta-sep"></div>
-                <span class="meta-read">5 min read</span>
+                <span class="meta-read">7 min read</span>
               </div>
-              <h2 class="post-title">Why Motivation Isn't Enough (And What Actually Works)</h2>
-              <p class="post-excerpt">Motivation is real, but it's also deeply unreliable. Here's the honest answer to why we start strong on a goal and then quietly fall apart — and what discipline, structure, and identity have to do with it.</p>
+              <h2 class="post-title">When Trust Breaks: Betrayal in Friendship vs. Betrayal in Love</h2>
+              <p class="post-excerpt">Two betrayals, one from a friend and one from a relationship, and the honest, research backed truth about why hurt spills onto people who did not deserve it, and what actually helps.</p>
               <span class="read-link">Read Article</span>
             </div>
           </a>
@@ -546,7 +547,53 @@
 
           <div class="posts-grid" id="postsGrid">
 
+            <!-- Post 1 -->
+            <a href="post-forgiveness-bible.html" class="post-card reveal" data-cat="faith" style="transition-delay:0.02s">
+              <div class="card-thumb">
+                <img
+                  src="../images/forgiveness.png"
+                  alt="What the Bible Actually Says About Forgiveness"
+                  loading="lazy"
+                />
+              </div>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="cat-badge">Faith</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-date">Aug 6, 2026</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-read">7 min</span>
+                </div>
+                <h3 class="card-title">What the Bible Actually Says About Forgiveness (And Why It's So Hard)</h3>
+                <p class="card-excerpt">Not the watered down "just let it go" version. The real weight of what scripture says about forgiveness, bitterness, and the difference between forgiving, trusting, and reconciling.</p>
+                <span class="read-link">Read Article</span>
+              </div>
+            </a>
+
             <!-- Post 2 -->
+            <a href="post-motivation.html" class="post-card reveal" data-cat="growth" style="transition-delay:0.04s">
+              <div class="card-thumb">
+                <img
+                  src="../images/Motivation.png"
+                  alt="Why Motivation Isn't Enough"
+                  loading="lazy"
+                />
+              </div>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="cat-badge">Growth</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-date">May 19, 2025</span>
+                  <div class="meta-sep"></div>
+                  <span class="meta-read">5 min</span>
+                </div>
+                <h3 class="card-title">Why Motivation Isn't Enough (And What Actually Works)</h3>
+                <p class="card-excerpt">Motivation is real, but it's also deeply unreliable. Here's the honest answer to why we start strong on a goal and then quietly fall apart, and what discipline, structure, and identity have to do with it.</p>
+                <span class="read-link">Read Article</span>
+              </div>
+            </a>
+
+            <!-- Post 3 -->
             <a href="post-emotional-bonds.html" class="post-card reveal" data-cat="relationships" style="transition-delay:0.05s">
               <div class="card-thumb">
                 <img
@@ -696,10 +743,11 @@
         <div class="sidebar-block reveal" style="transition-delay:0.2s">
           <div class="sidebar-title">Browse Topics</div>
           <div class="cat-list">
-            <div class="cat-item" onclick="filterPosts('all', null)">All Posts <span class="cat-count">6</span></div>
+            <div class="cat-item" onclick="filterPosts('all', null)">All Posts <span class="cat-count">8</span></div>
             <div class="cat-item" onclick="filterPosts('growth', null)">Growth & Motivation <span class="cat-count">2</span></div>
             <div class="cat-item" onclick="filterPosts('healing', null)">Healing <span class="cat-count">1</span></div>
-            <div class="cat-item" onclick="filterPosts('relationships', null)">Relationships <span class="cat-count">1</span></div>
+            <div class="cat-item" onclick="filterPosts('relationships', null)">Relationships <span class="cat-count">2</span></div>
+            <div class="cat-item" onclick="filterPosts('faith', null)">Faith <span class="cat-count">1</span></div>
             <div class="cat-item" onclick="filterPosts('mindset', null)">Mindset <span class="cat-count">1</span></div>
             <div class="cat-item" onclick="filterPosts('books', null)">Books <span class="cat-count">1</span></div>
           </div>
@@ -708,30 +756,30 @@
         <!-- Recent Posts -->
         <div class="sidebar-block reveal" style="transition-delay:0.25s">
           <div class="sidebar-title">Recent Posts</div>
+          <a href="post-betrayal-forgiveness.html" class="sb-recent-post">
+            <div class="sb-rp-thumb">
+              <img src="../images/whentrustbreaks.png" alt="When Trust Breaks" loading="lazy"/>
+            </div>
+            <div>
+              <div class="sb-rp-title">When Trust Breaks: Betrayal in Friendship vs. Love</div>
+              <div class="sb-rp-date">Aug 6, 2026</div>
+            </div>
+          </a>
+          <a href="post-forgiveness-bible.html" class="sb-recent-post">
+            <div class="sb-rp-thumb">
+              <img src="../images/forgiveness.png" alt="Forgiveness" loading="lazy"/>
+            </div>
+            <div>
+              <div class="sb-rp-title">What the Bible Actually Says About Forgiveness</div>
+              <div class="sb-rp-date">Aug 6, 2026</div>
+            </div>
+          </a>
           <a href="post-motivation.html" class="sb-recent-post">
             <div class="sb-rp-thumb">
               <img src="../images/Motivation.png" alt="Motivation" loading="lazy"/>
             </div>
             <div>
               <div class="sb-rp-title">Why Motivation Isn't Enough</div>
-              <div class="sb-rp-date">May 19, 2025</div>
-            </div>
-          </a>
-          <a href="post-emotional-bonds.html" class="sb-recent-post">
-            <div class="sb-rp-thumb">
-              <img src="../images/Healing.png" alt="Emotional Bonds" loading="lazy"/>
-            </div>
-            <div>
-              <div class="sb-rp-title">Why We Form Unhealthy Emotional Bonds</div>
-              <div class="sb-rp-date">May 19, 2025</div>
-            </div>
-          </a>
-          <a href="post-loss.html" class="sb-recent-post">
-            <div class="sb-rp-thumb">
-              <img src="../images/After_loss.png" alt="Loss" loading="lazy"/>
-            </div>
-            <div>
-              <div class="sb-rp-title">Learning to Live After Loss</div>
               <div class="sb-rp-date">May 19, 2025</div>
             </div>
           </a>
